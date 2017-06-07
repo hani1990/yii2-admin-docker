@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  nginx:
+    build:
+      context: ./docker-image/nginx
+    image: nginx:1.11
+    container_name: nginx
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./runtime/nginx:/opt/log/nginx
+      - ./:/opt/webroot
+      - ./docker-image/nginx/config/sites-enabled:/etc/nginx/sites-enabled
+    depends_on:
+      - php
+    networks:
+      - frontend
+    ports:
+      - "8083:8083"
+
+
+  php:
+    build:
+      context: ./docker-image/php
+    image: php:7
+    container_name: php
+    environment:
+      - TZ=Asia/Shanghai
+      - DBGP_IDEKEY=docker-php-debug
+    volumes:
+      - ./runtime/php:/opt/log/php
+      - ./:/opt/webroot
+    networks:
+      - frontend
+      - backend
+
+networks:
+    frontend:
+    backend:
